@@ -7,7 +7,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
+  background: linear-gradient(to right, #a8dadc, #fbc8d4); /* Degradê sugerido */
 }
+
+/* Opcional: Experimente outras combinações de cores */
+/* body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  background: linear-gradient(to right, #e0f7fa, #fce4ec);
+} */
 
 ::-webkit-scrollbar {
   width: 6px;
