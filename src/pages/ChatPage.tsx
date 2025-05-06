@@ -34,13 +34,13 @@ const ChatPage: React.FC = () => {
       sender: 'user',
     };
 
+    // TENTE COMENTAR ESTAS LINHAS PARA TESTAR
     setMessages((prev) => [...prev, newUserMessage]);
     setIsLoading(true);
     setError(null);
 
     try {
-      // DESCOMENTE A LINHA ABAIXO PARA TESTAR A CHAMADA DA API
-      const response = await axios.post('http://localhost:3001/api/chat', { mensagem: text });
+      const response = await axios.post('http://localhost:3001/api/chat', { mensagem: text }); // LINHA 58 - ONDE O ERRO OCORRE
       setIsLoading(false);
 
       if (response.data.resposta) {
