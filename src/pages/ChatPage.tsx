@@ -39,6 +39,7 @@ const ChatPage: React.FC = () => {
     setError(null);
 
     try {
+      // COMENTE A LINHA ABAIXO PARA TESTAR SE O ERRO PERSISTE
       const response = await axios.post('http://localhost:3001/api/chat', { mensagem: text });
       setIsLoading(false);
 
