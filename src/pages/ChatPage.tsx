@@ -39,20 +39,20 @@ const ChatPage: React.FC = () => {
     setError(null);
 
     try {
-      // COMENTE A LINHA ABAIXO PARA TESTAR SE O ERRO PERSISTE
-      // const response = await axios.post('http://localhost:3001/api/chat', { mensagem: text });
+      // DESCOMENTE A LINHA ABAIXO PARA TESTAR A CHAMADA DA API
+      const response = await axios.post('http://localhost:3001/api/chat', { mensagem: text });
       setIsLoading(false);
 
-      // if (response.data.resposta) {
-      //   const ecoResponseMessage: Message = {
-      //     id: Date.now().toString(),
-      //     text: response.data.resposta,
-      //     sender: 'eco',
-      //   };
-      //   setMessages((prev) => [...prev, ecoResponseMessage]);
-      // } else {
-      //   setError('Resposta da IA inválida.');
-      // }
+      if (response.data.resposta) {
+        const ecoResponseMessage: Message = {
+          id: Date.now().toString(),
+          text: response.data.resposta,
+          sender: 'eco',
+        };
+        setMessages((prev) => [...prev, ecoResponseMessage]);
+      } else {
+        setError('Resposta da IA inválida.');
+      }
     } catch (error: any) {
       setIsLoading(false);
       console.error('Erro ao enviar mensagem para o backend:', error.response?.data?.error || error.message);
@@ -70,7 +70,6 @@ const ChatPage: React.FC = () => {
         <Header title="ECO" showBackButton={false} />
 
         <div className="flex-1 overflow-y-auto p-4">
-          {/* COMENTE A LINHA ABAIXO PARA TESTAR */}
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
           ))}
@@ -90,8 +89,7 @@ const ChatPage: React.FC = () => {
           </motion.button>
         </div>
 
-        {/* COMENTE A LINHA ABAIXO PARA TESTAR */}
-        {/* <ChatInput onSendMessage={handleSendMessage} /> */}
+        <ChatInput onSendMessage={handleSendMessage} />
       </div>
     </PhoneFrame>
   );
