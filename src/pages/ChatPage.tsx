@@ -6,6 +6,7 @@ import PhoneFrame from '../components/PhoneFrame';
 import Header from '../components/Header';
 import ChatMessage, { Message } from '../components/ChatMessage';
 import ChatInput from '../components/ChatInput';
+import axios from 'axios'; // Importe o axios
 
 const initialMessages: Message[] = [
   {
@@ -15,59 +16,47 @@ const initialMessages: Message[] = [
   },
 ];
 
-const followUpResponses = [
-  {
-    id: 'response1',
-    text: 'Uma reflexão profunda. Que respostas você encontrou até agora?',
-    sender: 'eco' as const,
-  },
-  {
-    id: 'response2',
-    text: 'Entendo. E como isso tem afetado seu dia a dia?',
-    sender: 'eco' as const,
-  },
-  {
-    id: 'response3',
-    text: 'Interessante. Você consegue identificar quando começou a se sentir assim?',
-    sender: 'eco' as const,
-  },
-  {
-    id: 'response4',
-    text: 'Se pudesse mudar algo nesse aspecto da sua vida, o que seria?',
-    sender: 'eco' as const,
-  },
-];
-
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = (text: string) => {
+  const handleSendMessage = async (text: string) => {
     const newUserMessage: Message = {
       id: Date.now().toString(),
       text,
       sender: 'user',
     };
-    
+
     setMessages((prev) => [...prev, newUserMessage]);
-    
-    setTimeout(() => {
-      const randomResponse = followUpResponses[Math.floor(Math.random() * followUpResponses.length)];
-      
-      setMessages((prev) => [
-        ...prev,
-        {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post('http://localhost:3001/api/chat', { mensagem: text });
+      setIsLoading(false);
+
+      if (response.data.resposta) {
+        const ecoResponseMessage: Message = {
           id: Date.now().toString(),
-          text: randomResponse.text,
+          text: response.data.resposta,
           sender: 'eco',
-        },
-      ]);
-    }, 1000);
+        };
+        setMessages((prev) => [...prev, ecoResponseMessage]);
+      } else {
+        setError('Resposta da IA inválida.');
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      console.error('Erro ao enviar mensagem para o backend:', error.response?.data?.error || error.message);
+      setError('Falha ao obter resposta da IA.');
+    }
   };
 
   const goToVoiceMode = () => {
@@ -78,14 +67,16 @@ const ChatPage: React.FC = () => {
     <PhoneFrame>
       <div className="flex flex-col h-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
         <Header title="ECO" showBackButton={false} />
-        
+
         <div className="flex-1 overflow-y-auto p-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
           ))}
+          {isLoading && <div className="text-gray-500 animate-pulse">Carregando resposta...</div>}
+          {error && <div className="text-red-500">{error}</div>}
           <div ref={messagesEndRef} />
         </div>
-        
+
         <div className="p-4 flex justify-center">
           <motion.button
             onClick={goToVoiceMode}
@@ -96,7 +87,7 @@ const ChatPage: React.FC = () => {
             <Mic size={24} />
           </motion.button>
         </div>
-        
+
         <ChatInput onSendMessage={handleSendMessage} />
       </div>
     </PhoneFrame>
